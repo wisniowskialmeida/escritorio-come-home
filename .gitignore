@@ -6,3 +6,7 @@ data/*.json
 !data/config.exemplo.json
 data/logs/
 data/reunioes/
+
+# dados reais dos agentes da Come Home e o relatório que cada sistema refaz sozinho
+agentes/dados/
+agentes/*/RELATORIO.md

@@ -1,7 +1,7 @@
 /* ===========================================================
    roster.js — quem trabalha aqui.
-   BOSSES  : você (sempre em serviço, na Diretoria)
-   CATALOG : o agente de exemplo + vagas sugeridas para começar
+   BOSSES  : o dono e a sócia (sempre em serviço, na Diretoria)
+   CATALOG : os agentes da Come Home, o de exemplo e vagas sugeridas
    =========================================================== */
 const ROSTER = (() => {
 
@@ -23,6 +23,19 @@ const ROSTER = (() => {
         glasses: null, beard: null, tattoo: false, cap: false,
         uniforme: false
       }
+    },
+    {
+      id: 'boss-2', name: (window.ESCRITORIO && ESCRITORIO.socia) || 'Day', role: 'Sócia · Diretoria',
+      emoji: '⭐', boss: true, dept: 'diretoria', slotId: 'DIR-2',
+      status: 'trabalhando', locked: true,
+      source: 'Diretoria', sistema: null,
+      brief: 'Sócia da Come Home. Sempre em serviço.',
+      look: {
+        skin: '#d9a77e', hair: '#2a1a12', style: 'longo',
+        shirt: '#c0654a', pants: '#2b2d3a', shoes: '#15181f',
+        glasses: null, beard: null, tattoo: false, cap: false,
+        uniforme: false
+      }
     }
   ];
 
@@ -32,6 +45,49 @@ const ROSTER = (() => {
      'sugerido'  = vaga de ideia; contrate e depois ligue um sistema a ela
      =========================================================== */
   const CATALOG = [
+    /* ---- os agentes da Come Home: cada um opera o sistema da pasta agentes/<área> ---- */
+    {
+      key: 'atendimento', name: 'Lia', role: 'Atendimento', emoji: '🎧', cat: 'detectado',
+      system: 'Atendimento · Lia', sistema: 'atendimento',
+      desc: 'Responde todo contato que chega e entrega ao corretor certo.',
+      why: 'Quem pede informação de imóvel fala com várias imobiliárias. A primeira que responde sai na frente.',
+      look: { skin: '#e2b48b', hair: '#5a3b24', style: 'coque', shirt: '#cfa441', pants: '#1b2030', glasses: null, beard: null }
+    },
+    {
+      key: 'comercial', name: 'Bento', role: 'Comercial', emoji: '🔑', cat: 'detectado',
+      system: 'Comercial · Bento', sistema: 'comercial',
+      desc: 'Acompanha visitas, propostas e vendas de cada corretor, e a meta do mês.',
+      why: 'É onde o faturamento acontece: nenhuma negociação pode esfriar sem alguém ver.',
+      look: { skin: '#c9854f', hair: '#1a120d', style: 'fade', shirt: '#d9a531', pants: '#26304a', glasses: null, beard: 'cavanhaque' }
+    },
+    {
+      key: 'marketing', name: 'Nina', role: 'Marketing', emoji: '📣', cat: 'detectado',
+      system: 'Marketing · Nina', sistema: 'marketing',
+      desc: 'Cuida dos anúncios dos imóveis e de quanto custa cada contato em cada canal.',
+      why: 'Imóvel bem anunciado vende mais rápido, e verba no canal certo traz comprador de verdade.',
+      look: { skin: '#e0a878', hair: '#b8532b', style: 'longo', shirt: '#e2803a', pants: '#26304a', glasses: null, beard: null }
+    },
+    {
+      key: 'juridico', name: 'Teo', role: 'Jurídico', emoji: '⚖️', cat: 'detectado',
+      system: 'Jurídico · Teo', sistema: 'juridico',
+      desc: 'Leva cada venda fechada até a escritura e o registro, com os documentos em dia.',
+      why: 'Venda só termina no cartório. Prazo perdido vira dor de cabeça para cliente e corretor.',
+      look: { skin: '#f0c29b', hair: '#3b2a1e', style: 'curto', shirt: '#5b5aa8', pants: '#1b2030', glasses: 'retangular', beard: null }
+    },
+    {
+      key: 'financeiro', name: 'Rui', role: 'Financeiro', emoji: '🧾', cat: 'detectado',
+      system: 'Financeiro · Rui', sistema: 'financeiro',
+      desc: 'Cobra as comissões, paga os corretores e acompanha despesas e resultado do mês.',
+      why: 'Comissão esquecida é dinheiro perdido. Caixa em dia mostra o que dá para investir.',
+      look: { skin: '#c6936b', hair: '#111111', style: 'curto', shirt: '#3f8f5c', pants: '#26304a', glasses: 'redondo', beard: 'cheia' }
+    },
+    {
+      key: 'diretoria', name: 'Clara', role: 'Assistente da Diretoria', emoji: '🧭', cat: 'detectado',
+      system: 'Diretoria · Clara', sistema: 'diretoria',
+      desc: 'Junta o que todas as áreas veem e mantém o plano de melhorias do Vitor e da Day.',
+      why: 'Com cinco áreas apontando problemas, alguém precisa dizer o que vem primeiro.',
+      look: { skin: '#f7d7bd', hair: '#140f0c', style: 'longo', shirt: '#2f7a57', pants: '#1b2030', glasses: 'redondo', beard: null }
+    },
     {
       key: 'exemplo', name: 'EXEMPLO', role: 'Agente de demonstração', emoji: '🤖',
       cat: 'detectado', system: 'Agente de exemplo', sistema: 'exemplo',
@@ -46,12 +102,6 @@ const ROSTER = (() => {
       look: { skin: '#f0c29b', hair: '#241a13', style: 'fade', shirt: '#6366f1', pants: '#1b2030', glasses: null, beard: 'cavanhaque' }
     },
     {
-      key: 'atendimento', name: 'Bia', role: 'Atendimento & Suporte', emoji: '🎧', cat: 'sugerido',
-      desc: 'Responde dúvidas, resolve problemas e encaminha o que precisa de gente.',
-      why: 'Resposta rápida segura cliente. Um agente de primeira linha tira o volume repetitivo de você.',
-      look: { skin: '#7a4a2c', hair: '#140f0c', style: 'coque', shirt: '#14b8a6', pants: '#1b2030', glasses: 'redondo', beard: null }
-    },
-    {
       key: 'conteudo', name: 'Nico', role: 'Conteúdo & Redes Sociais', emoji: '📱', cat: 'sugerido',
       desc: 'Planeja o calendário, escreve legendas e acompanha o que funcionou.',
       why: 'Constância nas redes custa tempo. Com pauta e rascunho prontos, você só aprova.',
@@ -62,12 +112,6 @@ const ROSTER = (() => {
       desc: 'Escreve anúncios, páginas e e-mails e testa variações.',
       why: 'Texto é o que converte. Ter variações prontas acelera qualquer teste.',
       look: { skin: '#f7d7bd', hair: '#8b5a2b', style: 'curto', shirt: '#f59e0b', pants: '#1b2030', glasses: 'retangular', beard: null }
-    },
-    {
-      key: 'financeiro', name: 'Rafa', role: 'Financeiro', emoji: '🧾', cat: 'sugerido',
-      desc: 'Acompanha entradas, saídas e o caixa, e avisa quando algo foge do previsto.',
-      why: 'Número do caixa em dia evita surpresa e mostra o que dá para investir.',
-      look: { skin: '#c9854f', hair: '#1a120d', style: 'curto', shirt: '#22c55e', pants: '#26304a', glasses: 'retangular', beard: 'cheia' }
     },
     {
       key: 'dados', name: 'Cami', role: 'Dados & Relatórios', emoji: '🧮', cat: 'sugerido',
@@ -90,8 +134,8 @@ const ROSTER = (() => {
 
   function defaults() {
     const base = BOSSES.map(b => Object.assign({}, b, { look: Object.assign({}, b.look) }));
-    // começa só com o agente de exemplo, para mostrar como funciona
-    for (const k of ['exemplo']) {
+    // começa com os seis agentes da Come Home já contratados
+    for (const k of ['atendimento', 'comercial', 'marketing', 'juridico', 'financeiro', 'diretoria']) {
       const c = CATALOG.find(c => c.key === k);
       base.push(fromCatalog(c));
     }
@@ -150,6 +194,10 @@ const ROSTER = (() => {
   /** reencaixa campos que chegaram depois de a equipe já ter sido salva,
       como o id do sistema que o agente opera */
   function recompor() {
+    // equipe salva antes de a sócia existir no código: ela entra na Diretoria
+    for (const b of BOSSES) {
+      if (!team.some(a => a.id === b.id)) team.push(Object.assign({}, b, { look: Object.assign({}, b.look) }));
+    }
     for (const a of team) {
       const c = CATALOG.find(c => c.key === a.key);
       if (c) {

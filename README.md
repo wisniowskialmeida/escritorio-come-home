@@ -21,9 +21,38 @@ cd escritorio-de-agentes
 npm start
 ```
 
-Abra **http://localhost:4321**. Vem um agente de exemplo (pasta
-`exemplo-agente`): clique no computador dele e em **Ligar** para ver o fluxo
-completo.
+Abra **http://localhost:4321**. Os seis agentes da Come Home já vêm
+contratados: clique no computador de um deles e em **Ligar** para abrir o
+sistema dele.
+
+## Agentes da Come Home
+
+Cada agente cuida de uma área da imobiliária e tem um sistema próprio, na
+pasta `agentes/<área>`. O sistema mostra os números da área, uma lista
+**O que melhorar agora** (do mais urgente para o menos, com o fato e a ação
+sugerida) e as listas para cadastrar e editar os dados.
+
+| Agente | Área | Porta | Acompanha |
+| --- | --- | --- | --- |
+| Lia | Atendimento | 4411 | contatos, tempo de primeira resposta, canais |
+| Bento | Comercial | 4412 | negociações, funil, meta do mês, corretores |
+| Nina | Marketing | 4413 | imóveis à venda, anúncios, investimento e custo por contato |
+| Teo | Jurídico | 4414 | documentos, escritura e registro de cada venda |
+| Rui | Financeiro | 4415 | comissões, repasse aos corretores, despesas e resultado |
+| Clara | Diretoria | 4416 | o resumo de todas as áreas e o plano de melhorias |
+
+- As áreas leem os dados umas das outras. Uma venda fechada no Comercial vira
+  alerta na hora no Jurídico (abrir o processo) e no Financeiro (lançar a
+  comissão).
+- Na Diretoria, **Colocar no plano** transforma qualquer alerta numa melhoria
+  com responsável e prazo.
+- Os sistemas começam com dados de **exemplo**, marcados nas listas. O botão
+  **Apagar exemplos de todas as áreas**, na Diretoria, limpa tudo de uma vez.
+- Os dados ficam em `agentes/dados/` (fora do git). Cada sistema reescreve o
+  `RELATORIO.md` da sua pasta a cada mudança, e o `CLAUDE.md` diz ao agente
+  quem ele é e no que focar. É isso que ele lê em **Conversar** e na reunião.
+- Para rodar um sistema sem o escritório: `node agentes/comercial/server.js`.
+- Os números e os alertas saem de `agentes/nucleo/indicadores.js`.
 
 No Windows:
 - **`INICIAR ESCRITORIO.cmd`** sobe o escritório e o religa se ele cair.
@@ -128,6 +157,7 @@ index.html         a tela
 js/                motor isométrico, salas, móveis, bonecos, painéis
 css/style.css      tema
 exemplo-agente/    o menor sistema que o escritório sabe operar
+agentes/           os sistemas dos agentes da Come Home (nucleo/ é o código comum)
 come-home/         planta do andar da Imobiliária Come Home (abre direto no navegador)
 data/              seus dados (fora do git, menos os exemplos)
 ```

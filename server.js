@@ -23,10 +23,13 @@ const ROOT = __dirname;
    padrão abaixo; o modelo comentado está em data/config.exemplo.json. */
 const CONFIG_ARQ = path.join(ROOT, 'data', 'config.json');
 const CONFIG_PADRAO = {
-  nome: 'Escritório de Agentes', subtitulo: 'painel dos seus agentes de IA',
-  dono: 'Você', empresa: '', porta: 4321,
+  nome: 'Imobiliária Come Home', subtitulo: 'escritório dos agentes de IA',
+  dono: 'Vitor', socia: 'Day',
+  empresa: 'Imobiliária Come Home: venda de imóveis. Dono: Vitor. Sócia: Day. Times de atendimento, comercial, marketing, jurídico e financeiro.',
+  porta: 4321,
   reuniao: { automatica: false, dias: [1, 5], hora: 11, minuto: 0, duracaoMin: 30, modelo: 'sonnet',
-             foco: '', meta: { descricao: '', alvo: 0, feito: 0, unidade: 'resultados', ate: '' } }
+             foco: 'o que cada área pode melhorar na Come Home esta semana para vender mais e melhor',
+             meta: { descricao: '', alvo: 0, feito: 0, unidade: 'vendas', ate: '' } }
 };
 function lerConfig() {
   let c = {};
@@ -691,7 +694,7 @@ const servidor = http.createServer(async (req, res) => {
   /* configuração pública para a tela: nome, dono, reunião (sem segredo) */
   if (rota === '/config.js') {
     const c = lerConfig();
-    const pub = { nome: c.nome, subtitulo: c.subtitulo, dono: c.dono, empresa: c.empresa };
+    const pub = { nome: c.nome, subtitulo: c.subtitulo, dono: c.dono, socia: c.socia, empresa: c.empresa };
     res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end('window.ESCRITORIO = ' + JSON.stringify(pub) + ';\n');
     return;
