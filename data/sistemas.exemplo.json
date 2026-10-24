@@ -8,13 +8,137 @@
     "Opcionais: sobre (texto que aparece no monitor), dicas (lista de frases), aviso (faixa de alerta no monitor).",
     "O escritório só executa o que está neste arquivo, e recusa comando com & | ; < > ` $."
   ],
+  "atendimento": {
+    "nome": "Atendimento · Lia",
+    "tipo": "local",
+    "pasta": "agentes/atendimento",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4411"
+    },
+    "porta": 4411,
+    "abre": "/",
+    "sobre": "Sistema de Atendimento da Come Home. Responder rápido todo contato que chega e entregar ao corretor certo. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "comercial": {
+    "nome": "Comercial · Bento",
+    "tipo": "local",
+    "pasta": "agentes/comercial",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4412"
+    },
+    "porta": 4412,
+    "abre": "/",
+    "sobre": "Sistema de Comercial da Come Home. Transformar contatos em visitas, propostas e vendas, e bater a meta do mês. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "marketing": {
+    "nome": "Marketing · Nina",
+    "tipo": "local",
+    "pasta": "agentes/marketing",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4413"
+    },
+    "porta": 4413,
+    "abre": "/",
+    "sobre": "Sistema de Marketing da Come Home. Anunciar bem cada imóvel e investir nos canais que trazem compradores de verdade. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "juridico": {
+    "nome": "Jurídico · Teo",
+    "tipo": "local",
+    "pasta": "agentes/juridico",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4414"
+    },
+    "porta": 4414,
+    "abre": "/",
+    "sobre": "Sistema de Jurídico da Come Home. Levar cada venda fechada até a escritura e o registro sem atraso nem surpresa. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "financeiro": {
+    "nome": "Financeiro · Rui",
+    "tipo": "local",
+    "pasta": "agentes/financeiro",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4415"
+    },
+    "porta": 4415,
+    "abre": "/",
+    "sobre": "Sistema de Financeiro da Come Home. Receber toda comissão, pagar os corretores em dia e manter o caixa no azul. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "diretoria": {
+    "nome": "Diretoria · Clara",
+    "tipo": "local",
+    "pasta": "agentes/diretoria",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4416"
+    },
+    "porta": 4416,
+    "abre": "/",
+    "sobre": "Sistema de Diretoria da Come Home. Juntar o que cada área vê e transformar em um plano de melhorias para o Vitor e a Day. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Use \"Colocar no plano\" para transformar um alerta em melhoria com responsável e prazo"
+    ]
+  },
   "exemplo": {
     "nome": "Agente de exemplo",
     "tipo": "local",
     "pasta": "exemplo-agente",
     "comando": "node",
-    "args": ["server.js"],
-    "env": { "PORT": "4401" },
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4401"
+    },
     "porta": 4401,
     "abre": "/",
     "sobre": "Um sistema mínimo que vem junto com o escritório, para mostrar como ele liga, embute e conversa com um agente. Copie a pasta exemplo-agente como ponto de partida, ou cadastre o seu projeto pela tela.",

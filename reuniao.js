@@ -192,8 +192,8 @@ async function rodar(equipe, opcoes = {}) {
       `${ctx}\n\n` +
       `Você é ${ag.nome} (${ag.papel}), responsável por este projeto.\n\n` +
       `Consulte o projeto no máximo duas vezes. Responda em até 6 linhas, nesta ordem:\n` +
-      `1. O número que você controla hoje (dado real do projeto; se não houver, diga).\n` +
-      `2. A MELHORIA no seu próprio sistema que mais ajudaria na meta — uma só.\n` +
+      `1. O número que você controla hoje (dado real do projeto; se houver RELATORIO.md, ele vem de lá; se não houver, diga).\n` +
+      `2. A MELHORIA na empresa, dentro da sua área, que mais ajudaria na meta — uma só.\n` +
       `3. O que você precisa de outro agente ou do dono para isso (diga de quem).`;
     const r = await perguntaAoAgente(ag.pasta, prompt, PAPEL_REUNIAO(), Math.min(sobra(), 5 * 60000));
     estado.custo += r.custo;
