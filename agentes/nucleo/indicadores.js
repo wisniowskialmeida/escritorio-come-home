@@ -330,8 +330,240 @@ function calcular(d, agora = new Date()) {
     };
   })();
 
+  /* imóveis ainda à venda, usados por Prospecção, Conteúdo e Copy */
+  const aVenda = (d.imoveis || []).filter(i => !vendidos.has(i.id));
+  const comProposta = new Set(ns.filter(n => ['proposta', 'fechado'].includes(n.etapa)).map(n => n.imovel));
+  const encalhado = i => diasDesde(i.captadoEm) > 90 && !comProposta.has(i.id);
+
+  /* ---------------- Prospecção ---------------- */
+  const prospeccao = (() => {
+    const ps = d.prospects || [];
+    const ativos = ps.filter(p => ['novo', 'em contato', 'qualificado'].includes(p.etapa));
+    const atrasados = ativos.filter(p => p.proximoContato && diasDesde(p.proximoContato) > 0);
+    const semProximo = ativos.filter(p => !p.proximoContato);
+    const entreguesMes = ps.filter(p => p.etapa === 'enviado ao atendimento' && mesDe(p.ultimoContato) === mesAtual);
+    const captadosMes = ps.filter(p => p.etapa === 'imóvel captado' && mesDe(p.ultimoContato) === mesAtual);
+    const semCredito = ativos.filter(p => p.perfil === 'comprador' && p.credito === 'não simulado');
+    const perdasCredito = ns.filter(n => n.etapa === 'perdido' && n.motivoPerda === 'financiamento negado').length;
+    const bairrosEstoque = new Set(aVenda.map(i => String(i.bairro || '').toLowerCase()));
+    const procura = {};
+    for (const p of ativos.filter(p => p.perfil === 'comprador' && p.bairro)) {
+      if (!bairrosEstoque.has(p.bairro.toLowerCase())) procura[p.bairro] = (procura[p.bairro] || 0) + 1;
+    }
+    const semEstoque = Object.entries(procura).sort((a, b) => b[1] - a[1]);
+    const encerrados = ps.filter(p => ['enviado ao atendimento', 'imóvel captado', 'descartado'].includes(p.etapa));
+    const aproveitamento = pct(encerrados.filter(p => p.etapa !== 'descartado').length, encerrados.length);
+
+    const melhorias = [];
+    if (atrasados.length) melhorias.push({ nivel: 'alta',
+      texto: `${plural(atrasados.length, 'retorno está atrasado', 'retornos estão atrasados')}: ${lista(atrasados.map(p => `${p.nome} (${diasDesde(p.proximoContato)} d)`))}.`,
+      acao: 'Fazer esses contatos hoje. Prospect que fica sem retorno esfria e procura outra imobiliária.' });
+    if (semCredito.length) melhorias.push({ nivel: perdasCredito >= 2 ? 'alta' : 'media',
+      texto: `${plural(semCredito.length, 'comprador ainda não simulou', 'compradores ainda não simularam')} o crédito: ${lista(semCredito.map(p => p.nome))}.` +
+             (perdasCredito ? ` O Comercial já perdeu ${plural(perdasCredito, 'venda', 'vendas')} por financiamento negado.` : ''),
+      acao: 'Simular o financiamento antes de entregar ao Atendimento. Comprador com crédito aprovado fecha mais rápido.' });
+    if (semEstoque.length) melhorias.push({ nivel: 'media',
+      texto: `Há procura sem imóvel à venda: ${lista(semEstoque.map(([b, q]) => `${b} (${plural(q, 'comprador', 'compradores')})`))}.`,
+      acao: 'Prospectar proprietários nesses bairros: porta a porta, síndicos e indicações de clientes.' });
+    if (semProximo.length) melhorias.push({ nivel: 'media',
+      texto: `${plural(semProximo.length, 'prospect ativo está', 'prospects ativos estão')} sem data de próximo contato: ${lista(semProximo.map(p => p.nome))}.`,
+      acao: 'Marcar a data do próximo contato em cada um. Sem data, ninguém lembra de ligar.' });
+    if (aVenda.length < 10) melhorias.push({ nivel: 'baixa',
+      texto: `A carteira tem ${plural(aVenda.length, 'imóvel', 'imóveis')} à venda.`,
+      acao: 'Reservar parte da semana para captar: imóvel novo na carteira traz contato novo.' });
+
+    return {
+      kpis: [
+        { rotulo: 'Prospects ativos', valor: ativos.length, detalhe: `${ativos.filter(p => p.perfil === 'comprador').length} compradores · ${ativos.filter(p => p.perfil === 'proprietário').length} proprietários` },
+        { rotulo: 'Retornos atrasados', valor: atrasados.length, detalhe: semProximo.length ? `${semProximo.length} sem data marcada` : 'todos com data',
+          tom: atrasados.length ? 'ruim' : semProximo.length ? 'atencao' : 'bom' },
+        { rotulo: 'Entregues ao Atendimento', valor: entreguesMes.length, detalhe: 'compradores qualificados no mês' },
+        { rotulo: 'Imóveis captados', valor: captadosMes.length, detalhe: encerrados.length ? `${aproveitamento}% dos prospects encerrados viraram negócio` : 'no mês' }
+      ],
+      melhorias,
+      tabelas: [{ titulo: 'Prospects por origem', colunas: ['Origem', 'Ativos', 'Aproveitados', 'Descartados'],
+        linhas: [...new Set(ps.map(p => p.origem).filter(Boolean))].map(o => [o,
+          ps.filter(p => p.origem === o && ativos.includes(p)).length,
+          ps.filter(p => p.origem === o && ['enviado ao atendimento', 'imóvel captado'].includes(p.etapa)).length,
+          ps.filter(p => p.origem === o && p.etapa === 'descartado').length]).sort((a, b) => b[2] - a[2] || b[1] - a[1]) }]
+    };
+  })();
+
+  /* ---------------- Conteúdo ---------------- */
+  const conteudo = (() => {
+    const ps = d.posts || [];
+    const publicados = ps.filter(p => p.status === 'publicado');
+    const pubMes = publicados.filter(p => mesDe(p.data) === mesAtual);
+    const pub30 = publicados.filter(p => diasDesde(p.data) <= 30);
+    const proximos = ps.filter(p => ['agendado', 'produzindo'].includes(p.status) && diasDesde(p.data) <= 0 && diasDesde(p.data) >= -7);
+    const atrasados = ps.filter(p => ['agendado', 'produzindo'].includes(p.status) && diasDesde(p.data) > 0);
+    const alcance = media(pub30.map(p => p.alcance).filter(x => x != null));
+    const instagramMes = contatosMes.filter(c => c.canal === 'Instagram').length;
+    const divulgados = new Set(publicados.filter(p => diasDesde(p.data) <= 60).map(p => p.imovel));
+    const nunca = aVenda.filter(i => i.status !== 'pausado' && !publicados.some(p => p.imovel === i.id));
+    const encalhadosSemPost = aVenda.filter(i => encalhado(i) && !divulgados.has(i.id));
+    const formatos = {};
+    for (const p of publicados.filter(p => diasDesde(p.data) <= 90 && p.contatos != null)) {
+      const f = formatos[p.formato] || (formatos[p.formato] = { posts: 0, contatos: 0 });
+      f.posts++; f.contatos += p.contatos;
+    }
+    const ranking = Object.entries(formatos).map(([f, v]) => [f, v.posts, v.contatos / v.posts]).sort((a, b) => b[2] - a[2]);
+
+    const melhorias = [];
+    if (!proximos.length) melhorias.push({ nivel: 'alta',
+      texto: 'Não há nenhum post agendado para os próximos 7 dias.',
+      acao: 'Agendar ao menos dois posts esta semana, um deles com imóvel em vídeo.' });
+    for (const p of atrasados) melhorias.push({ nivel: 'media',
+      texto: `O post "${p.tema}" era para ${plural(diasDesde(p.data), 'dia', 'dias')} atrás e ainda está como ${p.status}.`,
+      acao: 'Publicar hoje ou remarcar a data no calendário.' });
+    if (nunca.length) melhorias.push({ nivel: 'media',
+      texto: `${plural(nunca.length, 'imóvel à venda nunca apareceu', 'imóveis à venda nunca apareceram')} nas redes: ${lista(nunca.map(i => i.codigo), 5)}.`,
+      acao: 'Incluir esses imóveis no calendário, começando pelos captados mais recentemente.' });
+    if (encalhadosSemPost.length) melhorias.push({ nivel: 'media',
+      texto: `Imóveis parados há mais de 90 dias sem post nos últimos 60 dias: ${lista(encalhadosSemPost.map(i => i.codigo))}.`,
+      acao: 'Fazer um vídeo novo desses imóveis, mostrando o que eles têm de melhor.' });
+    if (ranking.length > 1) melhorias.push({ nivel: 'baixa',
+      texto: `${ranking[0][0][0].toUpperCase() + ranking[0][0].slice(1)} é o formato que mais traz contato: ${ranking[0][2].toFixed(1).replace('.', ',')} por post, contra ${ranking[ranking.length - 1][2].toFixed(1).replace('.', ',')} em ${ranking[ranking.length - 1][0]}.`,
+      acao: `Fazer mais ${ranking[0][0]} e menos ${ranking[ranking.length - 1][0]} nas próximas semanas.` });
+
+    return {
+      kpis: [
+        { rotulo: 'Posts publicados no mês', valor: pubMes.length, detalhe: `${pub30.length} nos últimos 30 dias`, tom: pub30.length >= 8 ? 'bom' : pub30.length >= 4 ? 'atencao' : 'ruim' },
+        { rotulo: 'Agendados para 7 dias', valor: proximos.length, detalhe: atrasados.length ? plural(atrasados.length, 'atrasado', 'atrasados') : 'nenhum atrasado',
+          tom: !proximos.length ? 'ruim' : atrasados.length ? 'atencao' : 'bom' },
+        { rotulo: 'Alcance médio', valor: alcance === null ? '—' : Math.round(alcance).toLocaleString('pt-BR'), detalhe: 'por post, últimos 30 dias' },
+        { rotulo: 'Contatos do Instagram', valor: instagramMes, detalhe: 'chegaram ao Atendimento no mês' }
+      ],
+      melhorias,
+      tabelas: [{ titulo: 'Formatos · últimos 90 dias', colunas: ['Formato', 'Posts', 'Contatos por post'],
+        linhas: ranking.map(([f, n, m]) => [f, n, m.toFixed(1).replace('.', ',')]) }]
+    };
+  })();
+
+  /* ---------------- Copy ---------------- */
+  const copy = (() => {
+    const ts = d.textos || [];
+    const prontos = ts.filter(t => ['aprovado', 'publicado'].includes(t.status));
+    const anunciados = aVenda.filter(i => i.status !== 'pausado');
+    const comTexto = new Set(prontos.map(t => t.imovel));
+    const semTexto = anunciados.filter(i => !comTexto.has(i.id));
+    const revisao = ts.filter(t => t.status === 'em revisão');
+    const revisaoParada = revisao.filter(t => diasDesde(t.atualizado) > 3);
+    const ativos = prontos.filter(t => !vendidos.has(t.imovel));
+    const problemas = t => {
+      const i = imovel[t.imovel] || {};
+      const corpo = `${t.titulo || ''} ${t.texto || ''}`;
+      const out = [];
+      if (['portais', 'site'].includes(t.canal) && String(t.texto || '').length < 250) out.push('texto curto');
+      if (i.bairro && !corpo.toLowerCase().includes(String(i.bairro).toLowerCase())) out.push('sem o bairro');
+      if (!/agend|visit|whats|direct|fale|ligue|chame|marque/i.test(corpo)) out.push('sem chamada para a visita');
+      return out;
+    };
+    const comProblema = ativos.filter(t => problemas(t).length);
+    const velhos = ativos.filter(t => (imovel[t.imovel] && encalhado(imovel[t.imovel])) && diasDesde(t.atualizado) > 60);
+    const comNumeros = ativos.filter(t => t.status === 'publicado' && t.contatos != null);
+    const melhor = comNumeros.slice().sort((a, b) => b.contatos - a.contatos)[0];
+
+    const melhorias = [];
+    if (semTexto.length) melhorias.push({ nivel: 'alta',
+      texto: `${plural(semTexto.length, 'imóvel anunciado está', 'imóveis anunciados estão')} sem texto aprovado: ${lista(semTexto.map(i => i.codigo), 5)}.`,
+      acao: 'Escrever o anúncio com o diferencial do imóvel no título, o bairro e um convite para agendar a visita.' });
+    for (const t of velhos) melhorias.push({ nivel: 'media',
+      texto: `O anúncio do ${codigo(t.imovel)} não muda há ${diasDesde(t.atualizado)} dias e o imóvel segue sem proposta.`,
+      acao: 'Reescrever com outro ângulo (para quem é o imóvel, o que a pessoa ganha) e trocar a foto de capa com o Marketing.' });
+    if (comProblema.length) melhorias.push({ nivel: 'media',
+      texto: `${plural(comProblema.length, 'texto no ar tem', 'textos no ar têm')} problema: ${lista(comProblema.map(t => `${codigo(t.imovel)} (${problemas(t).join(', ')})`))}.`,
+      acao: 'Corrigir: portal pede texto completo, o comprador busca pelo bairro e todo anúncio precisa terminar com o convite para a visita.' });
+    if (revisaoParada.length) melhorias.push({ nivel: 'media',
+      texto: `${plural(revisaoParada.length, 'texto está', 'textos estão')} em revisão há mais de 3 dias: ${lista(revisaoParada.map(t => codigo(t.imovel)))}.`,
+      acao: 'Pedir a aprovação do Vitor ou da Day hoje para o anúncio entrar no ar.' });
+    if (melhor && melhor.contatos > 0) melhorias.push({ nivel: 'baixa',
+      texto: `O anúncio do ${codigo(melhor.imovel)} é o que mais trouxe contato (${melhor.contatos}).`,
+      acao: 'Usar a estrutura dele como modelo para os próximos textos.' });
+
+    return {
+      kpis: [
+        { rotulo: 'Imóveis com texto pronto', valor: `${anunciados.length - semTexto.length} de ${anunciados.length}`, detalhe: 'aprovado ou publicado',
+          tom: semTexto.length ? (semTexto.length > anunciados.length / 3 ? 'ruim' : 'atencao') : 'bom' },
+        { rotulo: 'Em revisão', valor: revisao.length, detalhe: revisaoParada.length ? `${revisaoParada.length} há mais de 3 dias` : 'nenhum parado', tom: revisaoParada.length ? 'atencao' : null },
+        { rotulo: 'Textos com problema', valor: comProblema.length, detalhe: 'curtos, sem bairro ou sem convite para visita', tom: comProblema.length ? 'atencao' : 'bom' },
+        { rotulo: 'Contatos por anúncio', valor: comNumeros.length ? media(comNumeros.map(t => t.contatos)).toFixed(1).replace('.', ',') : '—', detalhe: 'média dos publicados' }
+      ],
+      melhorias,
+      tabelas: []
+    };
+  })();
+
+  /* ---------------- Dados ---------------- */
+  const dadosArea = (() => {
+    const cs = d.contatos || [];
+    const ult90 = cs.filter(c => c.chegou && agora - quando(c.chegou) <= 90 * MS_DIA);
+    const negDe = c => ns.filter(n => n.contato === c.id);
+    const viraram = ult90.filter(c => negDe(c).length);
+    const proposta = ult90.filter(c => negDe(c).some(n => n.etapa === 'proposta' || n.etapa === 'fechado' || (n.etapa === 'perdido' && n.valor)));
+    const venda = ult90.filter(c => negDe(c).some(n => n.etapa === 'fechado'));
+    const passos = [
+      { de: 'Contato', para: 'Negociação', a: ult90.length, b: viraram.length,
+        acao: 'Muitos contatos não viram visita: rever a qualificação no Atendimento e a velocidade de resposta.' },
+      { de: 'Negociação', para: 'Proposta', a: viraram.length, b: proposta.length,
+        acao: 'Muitas visitas sem proposta: escolher melhor os imóveis mostrados e voltar ao cliente em até 24 h depois da visita.' },
+      { de: 'Proposta', para: 'Venda', a: proposta.length, b: venda.length,
+        acao: 'Muitas propostas sem venda: alinhar preço com os proprietários e resolver o crédito antes da proposta.' }
+    ];
+    const gargalo = passos.filter(p => p.a >= 3).sort((x, y) => x.b / x.a - y.b / y.a)[0];
+    const diasAteVenda = media(fechados.map(n => contato[n.contato] && contato[n.contato].chegou && n.fechadoEm
+      ? (quando(n.fechadoEm) - quando(contato[n.contato].chegou)) / MS_DIA : null).filter(x => x !== null && x >= 0));
+    const ticket = media(fechados.map(n => n.valor).filter(Boolean));
+    const janela = (ini, fim) => cs.filter(c => c.chegou && agora - quando(c.chegou) > ini * MS_DIA && agora - quando(c.chegou) <= fim * MS_DIA).length;
+    const agora30 = janela(0, 30), antes30 = janela(30, 60);
+    const vendasJanela = (ini, fim) => fechados.filter(n => n.fechadoEm && diasDesde(n.fechadoEm) >= ini && diasDesde(n.fechadoEm) < fim).length;
+
+    const faltas = [];
+    const conta = (area, l, f, o) => { const n = l.filter(f).length; if (n) faltas.push(`${area}: ${plural(n, o[0], o[1])}`); return n; };
+    let incompletos = 0;
+    incompletos += conta('Atendimento', cs, c => !c.canal, ['contato sem canal', 'contatos sem canal']);
+    incompletos += conta('Comercial', ns, n => !n.corretor || !n.imovel, ['negociação sem corretor ou imóvel', 'negociações sem corretor ou imóvel']);
+    incompletos += conta('Comercial', ns, n => n.etapa === 'fechado' && (!n.valor || !n.fechadoEm), ['venda sem valor ou data', 'vendas sem valor ou data']);
+    incompletos += conta('Comercial', ns, n => n.etapa === 'perdido' && !n.motivoPerda, ['perda sem motivo', 'perdas sem motivo']);
+    incompletos += conta('Marketing', d.imoveis || [], i => !i.preco || !i.captadoEm, ['imóvel sem preço ou data de captação', 'imóveis sem preço ou data de captação']);
+    if (!(d.despesas || []).some(x => x.mes === mesAtual)) { faltas.push('Financeiro: despesas do mês não lançadas'); incompletos++; }
+    if (!(d.metas || []).some(m => m.mes === mesAtual)) { faltas.push('Comercial: meta do mês não cadastrada'); incompletos++; }
+
+    const melhorias = [];
+    if (faltas.length) melhorias.push({ nivel: 'media',
+      texto: `Há dados incompletos: ${faltas.join('; ')}.`,
+      acao: 'Pedir a cada área que complete. Com dado faltando, os números e os alertas de todos os agentes ficam errados.' });
+    if (gargalo) melhorias.push({ nivel: 'alta',
+      texto: `O maior gargalo do funil está entre ${gargalo.de.toLowerCase()} e ${gargalo.para.toLowerCase()}: só ${pct(gargalo.b, gargalo.a)}% passam (${gargalo.b} de ${gargalo.a} nos últimos 90 dias).`,
+      acao: gargalo.acao });
+    if (antes30 >= 5 && agora30 < antes30 * 0.8) melhorias.push({ nivel: 'media',
+      texto: `Os contatos caíram ${pct(antes30 - agora30, antes30)}%: ${agora30} nos últimos 30 dias contra ${antes30} nos 30 anteriores.`,
+      acao: 'Ver com o Marketing e o Conteúdo o que mudou nos anúncios e nas redes.' });
+    if (diasAteVenda) melhorias.push({ nivel: 'baixa',
+      texto: `Do primeiro contato até a venda leva em média ${Math.round(diasAteVenda)} dias.`,
+      acao: 'Usar esse prazo no planejamento: o contato que chega hoje vira venda daqui a esse tempo.' });
+
+    return {
+      kpis: [
+        { rotulo: 'Conversão contato → venda', valor: ult90.length ? pct(venda.length, ult90.length) + '%' : '—', detalhe: `${venda.length} vendas de ${ult90.length} contatos em 90 dias` },
+        { rotulo: 'Tempo até a venda', valor: diasAteVenda ? `${Math.round(diasAteVenda)} dias` : '—', detalhe: 'do primeiro contato ao fechamento' },
+        { rotulo: 'Ticket médio', valor: ticket ? brlCurto(ticket) : '—', detalhe: 'valor médio das vendas' },
+        { rotulo: 'Registros incompletos', valor: incompletos, detalhe: 'somando todas as áreas', tom: incompletos ? 'atencao' : 'bom' }
+      ],
+      melhorias,
+      tabelas: [
+        { titulo: 'Funil · contatos dos últimos 90 dias', colunas: ['Etapa', 'Quantidade', 'Passam para a próxima'],
+          linhas: [['Contato', ult90.length, pct(viraram.length, ult90.length) + '%'], ['Negociação', viraram.length, pct(proposta.length, viraram.length) + '%'],
+                   ['Proposta', proposta.length, pct(venda.length, proposta.length) + '%'], ['Venda', venda.length, '—']] },
+        { titulo: 'Últimos 30 dias contra os 30 anteriores', colunas: ['Indicador', 'Agora', 'Antes', 'Variação'],
+          linhas: [['Contatos', agora30, antes30], ['Vendas', vendasJanela(0, 30), vendasJanela(30, 60)]]
+            .map(([r, a, b]) => [r, a, b, b ? `${a >= b ? '+' : '−'}${Math.abs(pct(a - b, b))}%` : '—']) }
+      ]
+    };
+  })();
+
   /* ---------------- Diretoria ---------------- */
-  const areas = { atendimento, comercial, marketing, juridico, financeiro };
+  const areas = { atendimento, comercial, marketing, juridico, financeiro, prospeccao, conteudo, copy, analise: dadosArea };
   for (const [k, a] of Object.entries(areas)) {
     a.melhorias.sort((x, y) => ORDEM[x.nivel] - ORDEM[y.nivel]);
     for (const m of a.melhorias) m.area = AREAS[k].nome;
@@ -362,7 +594,7 @@ function calcular(d, agora = new Date()) {
     };
   })();
 
-  return { atendimento, comercial, marketing, juridico, financeiro, diretoria };
+  return Object.assign({}, areas, { diretoria });
 }
 
 /** texto em Markdown para o agente ler (RELATORIO.md) e para o terminal */

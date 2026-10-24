@@ -108,6 +108,86 @@
       "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
     ]
   },
+  "prospeccao": {
+    "nome": "Prospecção · Léo",
+    "tipo": "local",
+    "pasta": "agentes/prospeccao",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4417"
+    },
+    "porta": 4417,
+    "abre": "/",
+    "sobre": "Sistema de Prospecção da Come Home. Encontrar compradores e proprietários antes da concorrência, qualificar e entregar prontos para o time. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "conteudo": {
+    "nome": "Conteúdo · Nico",
+    "tipo": "local",
+    "pasta": "agentes/conteudo",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4418"
+    },
+    "porta": 4418,
+    "abre": "/",
+    "sobre": "Sistema de Conteúdo da Come Home. Manter as redes da Come Home ativas toda semana, com os imóveis certos no formato que traz contato. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "copy": {
+    "nome": "Copy · Duda",
+    "tipo": "local",
+    "pasta": "agentes/copy",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4419"
+    },
+    "porta": 4419,
+    "abre": "/",
+    "sobre": "Sistema de Copy da Come Home. Escrever anúncios que fazem o comprador pedir a visita, e reescrever os que não funcionam. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Clique numa linha da lista para editar; \"+\" cadastra um item novo",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
+  "analise": {
+    "nome": "Dados · Cami",
+    "tipo": "local",
+    "pasta": "agentes/analise",
+    "comando": "node",
+    "args": [
+      "server.js"
+    ],
+    "env": {
+      "PORT": "4420"
+    },
+    "porta": 4420,
+    "abre": "/",
+    "sobre": "Sistema de Dados da Come Home. Cruzar os números de todas as áreas, achar o gargalo do funil e garantir que os dados estejam completos. Mostra os números da área e o que melhorar agora.",
+    "dicas": [
+      "Este sistema só lê: os números vêm do que as outras áreas cadastram",
+      "Em Conversar, pergunte o que melhorar: o agente lê o RELATORIO.md da pasta dele",
+      "Os dados de exemplo são apagados de uma vez no sistema da Diretoria"
+    ]
+  },
   "diretoria": {
     "nome": "Diretoria · Clara",
     "tipo": "local",

@@ -22,14 +22,18 @@ function gravar(area, obj) {
 }
 
 /* Primeira vez (nenhum arquivo): nasce com os exemplos. O gerador é
-   determinístico, então os seis sistemas subindo juntos gravam o mesmo
-   conteúdo e as referências entre áreas batem. Se só faltar uma área,
-   ela nasce vazia para não misturar exemplo com dado real. */
+   determinístico, então os sistemas subindo juntos gravam o mesmo
+   conteúdo e as referências entre áreas batem. Uma área nova (agente
+   contratado depois) também nasce com exemplo enquanto as outras ainda
+   tiverem exemplo; depois que os dados reais entram, ela nasce vazia
+   para não misturar exemplo com dado real. */
 function garantir() {
   const faltam = Object.keys(COLECOES).filter(a => !fs.existsSync(arquivo(a)));
   if (!faltam.length) return;
-  const primeiraVez = faltam.length === Object.keys(COLECOES).length;
-  const base = primeiraVez ? exemplo.gerar() : null;
+  const existentes = Object.keys(COLECOES).filter(a => !faltam.includes(a));
+  const comExemplo = !existentes.length ||
+    existentes.some(a => Object.values(ler(a)).some(l => Array.isArray(l) && l.some(x => x.exemplo)));
+  const base = comExemplo ? exemplo.gerar() : null;
   for (const a of faltam) gravar(a, base ? base[a] : vazio(a));
 }
 
@@ -80,7 +84,7 @@ function limpar(campos, entrada) {
     else if (c.t === 'datahora') v = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v) ? String(v).slice(0, 16) : null;
     else if (c.t === 'mes') v = /^\d{4}-\d{2}$/.test(v) ? v : null;
     else if (c.t === 'opcao') v = c.op.includes(v) ? v : null;
-    else v = String(v).slice(0, 500);
+    else v = String(v).slice(0, c.t === 'textolongo' ? 4000 : 500);
     out[c.k] = v;
   }
   const falta = campos.find(c => c.obrigatorio && (out[c.k] === null || out[c.k] === ''));

@@ -21,7 +21,7 @@ cd escritorio-de-agentes
 npm start
 ```
 
-Abra **http://localhost:4321**. Os seis agentes da Come Home já vêm
+Abra **http://localhost:4321**. Os agentes da Come Home já vêm
 contratados: clique no computador de um deles e em **Ligar** para abrir o
 sistema dele.
 
@@ -40,6 +40,10 @@ sugerida) e as listas para cadastrar e editar os dados.
 | Teo | Jurídico | 4414 | documentos, escritura e registro de cada venda |
 | Rui | Financeiro | 4415 | comissões, repasse aos corretores, despesas e resultado |
 | Clara | Diretoria | 4416 | o resumo de todas as áreas e o plano de melhorias |
+| Léo | Prospecção | 4417 | prospects compradores e proprietários, retornos, crédito simulado, bairros sem estoque |
+| Nico | Conteúdo | 4418 | calendário de posts, imóveis que nunca apareceram nas redes, formato que traz contato |
+| Duda | Copy | 4419 | textos dos anúncios: imóvel sem texto, texto curto, sem bairro ou sem convite para visita |
+| Cami | Dados | 4420 | gargalo do funil, comparação com o mês anterior e dados incompletos (pasta `agentes/analise`) |
 
 - As áreas leem os dados umas das outras. Uma venda fechada no Comercial vira
   alerta na hora no Jurídico (abrir o processo) e no Financeiro (lançar a

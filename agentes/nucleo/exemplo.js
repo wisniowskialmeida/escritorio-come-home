@@ -107,12 +107,58 @@ function gerar(hoje = new Date()) {
     { id: 'mel-02', titulo: 'Parceria com correspondente bancário para pré-aprovar crédito antes da visita', area: 'Comercial', impacto: 'alto', responsavel: 'Vitor', prazo: dia(21), status: 'ideia', origem: 'Exemplo' }
   ].map(ex);
 
+  // [nome, perfil, origem, bairro, valor, crédito, etapa, último contato, próximo contato]
+  const prospects = [
+    ['Cláudio Martins', 'proprietário', 'porta a porta', 'Jardim Botânico', 920000, '', 'em contato', -6, -2],
+    ['Débora Santos', 'comprador', 'indicação', 'Vila Mariana', 700000, 'não simulado', 'qualificado', -3, 1],
+    ['Otávio Reis', 'comprador', 'evento', 'Bela Vista', 1300000, 'pré-aprovado', 'enviado ao atendimento', -9, null],
+    ['Helena Castro', 'proprietário', 'indicação', 'Vila Mariana', 780000, '', 'imóvel captado', -5, null],
+    ['Igor Fonseca', 'comprador', 'redes sociais', 'Centro', 350000, 'não simulado', 'em contato', -12, -4],
+    ['Lúcia Barreto', 'proprietário', 'lista de contatos', 'Portal do Sol', 1100000, '', 'novo', null, null],
+    ['Murilo Tavares', 'comprador', 'parceiro', 'Vila Mariana', 650000, 'à vista', 'qualificado', -1, 3],
+    ['Natália Gomes', 'comprador', 'redes sociais', 'Jardim América', 450000, 'não simulado', 'descartado', -20, null]
+  ].map(([nome, perfil, origem, bairro, orcamento, credito, etapa, ult, prox], n) => ex({
+    id: `pros-${pad(n + 1)}`, nome, telefone: `(11) 9${7300 + n * 41}-${pad(20 + n * 7)}${pad(11 + n)}`, perfil, origem, bairro, orcamento,
+    credito: credito || null, etapa, ultimoContato: ult === null ? null : dia(ult), proximoContato: prox === null ? null : dia(prox), obs: null
+  }));
+
+  // [dia, rede, formato, imóvel, tema, situação, alcance, contatos]
+  const posts = [
+    [-27, 'Instagram', 'reels', 'imo-101', 'Tour pela varanda gourmet do CH-101', 'publicado', 8400, 3],
+    [-21, 'Instagram', 'carrossel', 'imo-104', 'Cobertura com piscina: 8 fotos', 'publicado', 5200, 2],
+    [-16, 'Facebook', 'foto', 'imo-106', 'Apartamento reformado no Jardim América', 'publicado', 1900, 0],
+    [-12, 'Instagram', 'reels', 'imo-107', 'Um dia na casa em condomínio', 'publicado', 11300, 4],
+    [-8, 'Instagram', 'story', 'imo-103', 'Studio a 300 m do metrô', 'publicado', 2300, 1],
+    [-4, 'Instagram', 'carrossel', null, '5 documentos para separar antes de vender seu imóvel', 'publicado', 3900, 1],
+    [-2, 'Instagram', 'reels', 'imo-108', 'Sala comercial com vaga no Centro', 'produzindo', null, null],
+    [3, 'Instagram', 'reels', 'imo-101', 'Antes e depois da decoração do CH-101', 'agendado', null, null]
+  ].map(([d, rede, formato, imovel, tema, status, alcance, contatos], n) => ex({
+    id: `post-${pad(n + 1)}`, data: dia(d), rede, formato, imovel, tema, status, alcance, contatos
+  }));
+
+  const textos = [
+    { id: 'txt-01', imovel: 'imo-101', canal: 'portais', titulo: 'Apartamento 3 dormitórios com varanda gourmet no Jardim Botânico', status: 'publicado', contatos: 6, atualizado: dia(-38),
+      texto: 'Apartamento de 3 dormitórios, sendo 1 suíte, com varanda gourmet integrada à sala e vista livre para o verde do Jardim Botânico. Cozinha planejada, 2 vagas cobertas e lazer completo com piscina e academia. A 5 minutos do parque e das principais escolas do bairro. Agende sua visita pelo WhatsApp e conheça ainda esta semana.' },
+    { id: 'txt-02', imovel: 'imo-104', canal: 'Instagram', titulo: 'A cobertura que você vai querer mostrar para os amigos', status: 'publicado', contatos: 2, atualizado: dia(-21),
+      texto: 'Cobertura duplex com piscina privativa, churrasqueira e 4 suítes na Bela Vista. Fale com a gente pelo direct e agende uma visita.' },
+    { id: 'txt-03', imovel: 'imo-102', canal: 'portais', titulo: 'Casa térrea', status: 'publicado', contatos: 1, atualizado: dia(-120),
+      texto: 'Casa térrea com quintal. 3 quartos. Ótima localização.' },
+    { id: 'txt-04', imovel: 'imo-103', canal: 'portais', titulo: 'Studio mobiliado a 300 m do metrô no Centro', status: 'em revisão', contatos: null, atualizado: dia(-6),
+      texto: 'Studio de 32 m² totalmente mobiliado, pronto para morar ou alugar, a 300 metros do metrô. Prédio com portaria 24 horas, lavanderia e coworking. Ideal para quem quer praticidade no Centro. Agende sua visita.' },
+    { id: 'txt-05', imovel: 'imo-107', canal: 'site', titulo: 'Casa em condomínio com 4 suítes no Portal do Sol', status: 'aprovado', contatos: 3, atualizado: dia(-60),
+      texto: 'Casa de 320 m² em condomínio fechado no Portal do Sol, com 4 suítes, escritório, piscina aquecida e espaço gourmet. Segurança 24 horas, quadra e área verde para as crianças. Fale com um corretor da Come Home e marque sua visita.' }
+  ].map(ex);
+
   return {
     atendimento: { contatos },
     comercial: { negocios, corretores, metas },
     marketing: { imoveis, investimentos },
     juridico: { processos },
     financeiro: { comissoes, despesas },
+    prospeccao: { prospects },
+    conteudo: { posts },
+    copy: { textos },
+    analise: {},
     diretoria: { melhorias }
   };
 }

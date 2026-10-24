@@ -32,6 +32,10 @@ Seu trabalho é melhorar a Come Home na sua área:
 - Nina: Marketing (você)
 - Teo: Jurídico
 - Rui: Financeiro
+- Léo: Prospecção
+- Nico: Conteúdo
+- Duda: Copy
+- Cami: Dados
 - Clara: Diretoria
 
 ## O sistema

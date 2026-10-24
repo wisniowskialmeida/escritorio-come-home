@@ -5,7 +5,7 @@
    escreve nele; as outras apenas leem. Assim seis processos podem rodar
    ao mesmo tempo sem um sobrescrever o trabalho do outro.
 
-   Tipos de campo: texto, numero, dinheiro, data (AAAA-MM-DD),
+   Tipos de campo: texto, textolongo, numero, dinheiro, data (AAAA-MM-DD),
    datahora (AAAA-MM-DDTHH:MM), mes (AAAA-MM), sim (verdadeiro/falso),
    opcao (uma da lista) e ref (aponta para um item de outra coleção).
    `lista: true` faz o campo aparecer na tabela; os demais só no formulário.
@@ -33,6 +33,22 @@ const AREAS = {
   financeiro: {
     nome: 'Financeiro', agente: 'Rui', porta: 4415, cor: '#3f8f5c', sala: 'Financeiro',
     missao: 'Receber toda comissão, pagar os corretores em dia e manter o caixa no azul.'
+  },
+  prospeccao: {
+    nome: 'Prospecção', agente: 'Léo', porta: 4417, cor: '#6f7fe0', sala: 'Comercial',
+    missao: 'Encontrar compradores e proprietários antes da concorrência, qualificar e entregar prontos para o time.'
+  },
+  conteudo: {
+    nome: 'Conteúdo', agente: 'Nico', porta: 4418, cor: '#e06aa8', sala: 'Marketing',
+    missao: 'Manter as redes da Come Home ativas toda semana, com os imóveis certos no formato que traz contato.'
+  },
+  copy: {
+    nome: 'Copy', agente: 'Duda', porta: 4419, cor: '#f0a33a', sala: 'Marketing',
+    missao: 'Escrever anúncios que fazem o comprador pedir a visita, e reescrever os que não funcionam.'
+  },
+  analise: {
+    nome: 'Dados', agente: 'Cami', porta: 4420, cor: '#9a7be0', sala: 'Diretoria',
+    missao: 'Cruzar os números de todas as áreas, achar o gargalo do funil e garantir que os dados estejam completos.'
   },
   diretoria: {
     nome: 'Diretoria', agente: 'Clara', porta: 4416, cor: '#2f7a57', sala: 'Diretoria',
@@ -157,6 +173,58 @@ const COLECOES = {
       ]
     }
   },
+  prospeccao: {
+    prospects: {
+      titulo: 'Prospects', singular: 'prospect', rotulo: i => i.nome,
+      ordem: (a, b) => String(a.proximoContato || '9999').localeCompare(String(b.proximoContato || '9999')),
+      campos: [
+        { k: 'nome', t: 'texto', r: 'Nome', lista: true, obrigatorio: true },
+        { k: 'telefone', t: 'texto', r: 'Telefone' },
+        { k: 'perfil', t: 'opcao', r: 'Perfil', op: ['comprador', 'proprietário'], lista: true, padrao: 'comprador' },
+        { k: 'origem', t: 'opcao', r: 'Origem', op: ['indicação', 'redes sociais', 'evento', 'porta a porta', 'lista de contatos', 'parceiro'], lista: true },
+        { k: 'bairro', t: 'texto', r: 'Bairro (de interesse ou do imóvel)', lista: true },
+        { k: 'orcamento', t: 'dinheiro', r: 'Orçamento ou valor do imóvel', lista: true },
+        { k: 'credito', t: 'opcao', r: 'Crédito do comprador', op: ['', 'à vista', 'pré-aprovado', 'não simulado'] },
+        { k: 'etapa', t: 'opcao', r: 'Etapa', op: ['novo', 'em contato', 'qualificado', 'enviado ao atendimento', 'imóvel captado', 'descartado'], lista: true, padrao: 'novo' },
+        { k: 'ultimoContato', t: 'data', r: 'Último contato' },
+        { k: 'proximoContato', t: 'data', r: 'Próximo contato', lista: true },
+        { k: 'obs', t: 'texto', r: 'Observações' }
+      ]
+    }
+  },
+  conteudo: {
+    posts: {
+      titulo: 'Calendário de posts', singular: 'post',
+      ordem: (a, b) => String(b.data).localeCompare(String(a.data)),
+      campos: [
+        { k: 'data', t: 'data', r: 'Data', lista: true, obrigatorio: true },
+        { k: 'rede', t: 'opcao', r: 'Rede', op: ['Instagram', 'Facebook', 'TikTok', 'YouTube', 'LinkedIn', 'WhatsApp'], lista: true, padrao: 'Instagram' },
+        { k: 'formato', t: 'opcao', r: 'Formato', op: ['reels', 'carrossel', 'story', 'foto', 'vídeo longo'], lista: true },
+        { k: 'imovel', t: 'ref', r: 'Imóvel', ref: 'imoveis', lista: true },
+        { k: 'tema', t: 'texto', r: 'Tema ou legenda curta', lista: true },
+        { k: 'status', t: 'opcao', r: 'Situação', op: ['ideia', 'produzindo', 'agendado', 'publicado'], lista: true, padrao: 'ideia' },
+        { k: 'alcance', t: 'numero', r: 'Alcance' },
+        { k: 'contatos', t: 'numero', r: 'Contatos gerados', lista: true }
+      ]
+    }
+  },
+  copy: {
+    textos: {
+      titulo: 'Textos de anúncio', singular: 'texto',
+      ordem: (a, b) => String(b.atualizado).localeCompare(String(a.atualizado)),
+      campos: [
+        { k: 'imovel', t: 'ref', r: 'Imóvel', ref: 'imoveis', lista: true, obrigatorio: true },
+        { k: 'canal', t: 'opcao', r: 'Onde vai', op: ['portais', 'Instagram', 'site', 'WhatsApp', 'Google'], lista: true },
+        { k: 'titulo', t: 'texto', r: 'Título', lista: true },
+        { k: 'texto', t: 'textolongo', r: 'Texto do anúncio' },
+        { k: 'status', t: 'opcao', r: 'Situação', op: ['rascunho', 'em revisão', 'aprovado', 'publicado'], lista: true, padrao: 'rascunho' },
+        { k: 'contatos', t: 'numero', r: 'Contatos gerados', lista: true },
+        { k: 'atualizado', t: 'data', r: 'Atualizado em', lista: true }
+      ]
+    }
+  },
+  // Dados não guarda nada próprio: lê e cruza o que as outras áreas cadastram
+  analise: {},
   diretoria: {
     melhorias: {
       titulo: 'Plano de melhorias', singular: 'melhoria', f: true,
