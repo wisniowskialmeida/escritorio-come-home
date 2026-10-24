@@ -96,26 +96,30 @@ const ROSTER = (() => {
       look: { skin: '#c9854f', hair: '#140f0c', style: 'cacheado', shirt: '#38bdf8', pants: '#26304a', glasses: null, beard: null }
     },
     {
-      key: 'sdr', name: 'Léo', role: 'Prospecção & SDR', emoji: '🎯', cat: 'sugerido',
-      desc: 'Encontra clientes em potencial, qualifica e prepara a primeira abordagem.',
-      why: 'É o topo do funil: sem entrada de oportunidade nova, o resto da equipe fica sem trabalho.',
+      key: 'sdr', name: 'Léo', role: 'Prospecção & SDR', emoji: '🎯', cat: 'detectado',
+      system: 'Prospecção · Léo', sistema: 'prospeccao',
+      desc: 'Encontra compradores e proprietários, qualifica, simula o crédito e entrega pronto para o time.',
+      why: 'É o topo do funil: sem comprador novo e imóvel novo na carteira, o resto da equipe fica sem trabalho.',
       look: { skin: '#f0c29b', hair: '#241a13', style: 'fade', shirt: '#6366f1', pants: '#1b2030', glasses: null, beard: 'cavanhaque' }
     },
     {
-      key: 'conteudo', name: 'Nico', role: 'Conteúdo & Redes Sociais', emoji: '📱', cat: 'sugerido',
-      desc: 'Planeja o calendário, escreve legendas e acompanha o que funcionou.',
-      why: 'Constância nas redes custa tempo. Com pauta e rascunho prontos, você só aprova.',
+      key: 'conteudo', name: 'Nico', role: 'Conteúdo & Redes Sociais', emoji: '📱', cat: 'detectado',
+      system: 'Conteúdo · Nico', sistema: 'conteudo',
+      desc: 'Planeja o calendário de posts dos imóveis e acompanha o formato que traz contato.',
+      why: 'Constância nas redes custa tempo. Com o calendário em dia, todo imóvel aparece e você só aprova.',
       look: { skin: '#e0a878', hair: '#5a3a22', style: 'longo', shirt: '#f472b6', pants: '#26304a', glasses: null, beard: null }
     },
     {
-      key: 'copy', name: 'Duda', role: 'Copywriter', emoji: '✍️', cat: 'sugerido',
-      desc: 'Escreve anúncios, páginas e e-mails e testa variações.',
-      why: 'Texto é o que converte. Ter variações prontas acelera qualquer teste.',
+      key: 'copy', name: 'Duda', role: 'Copywriter', emoji: '✍️', cat: 'detectado',
+      system: 'Copy · Duda', sistema: 'copy',
+      desc: 'Escreve e revisa os anúncios dos imóveis e reescreve os que não trazem contato.',
+      why: 'Texto é o que converte. Anúncio com bairro, diferencial e convite para visita traz mais contato.',
       look: { skin: '#f7d7bd', hair: '#8b5a2b', style: 'curto', shirt: '#f59e0b', pants: '#1b2030', glasses: 'retangular', beard: null }
     },
     {
-      key: 'dados', name: 'Cami', role: 'Dados & Relatórios', emoji: '🧮', cat: 'sugerido',
-      desc: 'Junta os números dos outros sistemas num painel e explica o que mudou.',
+      key: 'dados', name: 'Cami', role: 'Dados & Relatórios', emoji: '🧮', cat: 'detectado',
+      system: 'Dados · Cami', sistema: 'analise',
+      desc: 'Cruza os números de todas as áreas, acha o gargalo do funil e cobra os dados que faltam.',
       why: 'Com vários agentes trabalhando, alguém precisa olhar o todo e dizer o que está funcionando.',
       look: { skin: '#f0c29b', hair: '#140f0c', style: 'longo', shirt: '#8b5cf6', pants: '#1b2030', glasses: 'redondo', beard: null }
     },

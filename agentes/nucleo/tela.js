@@ -63,7 +63,9 @@
       h += area === 'diretoria'
         ? `<div class="aviso" role="status"><span>Os sistemas estão com dados de <b>exemplo</b>, marcados nas listas. Quando quiser começar com os dados reais da Come Home, apague todos de uma vez.</span>
              <button class="btn perigo" data-acao="limpar">Apagar exemplos de todas as áreas</button></div>`
-        : `<div class="aviso" role="status"><span>Estes são dados de <b>exemplo</b>, marcados nas listas. Para começar com os dados reais, apague os exemplos no sistema da Diretoria.</span></div>`;
+        : `<div class="aviso" role="status"><span>${Object.keys(P.colecoes).length
+            ? 'Estes são dados de <b>exemplo</b>, marcados nas listas.'
+            : 'Os números abaixo ainda vêm de dados de <b>exemplo</b> das outras áreas.'} Para começar com os dados reais, apague os exemplos no sistema da Diretoria.</span></div>`;
     }
 
     h += `<section class="kpis" aria-label="Números">${I.kpis.map(k => `
@@ -139,6 +141,7 @@
       if (c.t === 'sim') return `<div class="campo check"><input type="checkbox" id="${id}" name="${c.k}" ${val ? 'checked' : ''}><label for="${id}">${esc(c.r)}</label></div>`;
       let input;
       if (c.t === 'opcao') input = `<select id="${id}" name="${c.k}">${c.op.map(o => `<option value="${esc(o)}" ${o === (val || '') ? 'selected' : ''}>${esc(o || '—')}</option>`).join('')}${c.op.includes('') ? '' : `<option value="" ${val ? '' : 'selected'}>—</option>`}</select>`;
+      else if (c.t === 'textolongo') return `<div class="campo largo"><label for="${id}">${esc(c.r)}</label><textarea id="${id}" name="${c.k}" rows="6">${esc(val == null ? '' : val)}</textarea></div>`;
       else if (c.t === 'ref') input = `<select id="${id}" name="${c.k}"><option value="">—</option>${(P.refs[c.ref] || []).map(r => `<option value="${esc(r.id)}" ${r.id === val ? 'selected' : ''}>${esc(r.rotulo)}</option>`).join('')}</select>`;
       else {
         const tipo = { numero: 'number', dinheiro: 'number', data: 'date', datahora: 'datetime-local', mes: 'month' }[c.t] || 'text';
